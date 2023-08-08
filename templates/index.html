@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Image Recognition App</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="styles.css">
+<!-- css -->
+    <style>
+        body {
+            background-color: beige;
+            color: black;
+            font-family: 'bodoni mt', serif;
+        }
+
+        .header {
+            text-align: center;
+            font-size: 36px;
+            padding-top: 20px;
+        }
+
+        .image-upload {
+            text-align: center;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        #uploaded-image {
+            max-width: 100%;
+            max-height: 300px;
+            margin-top: 20px;
+            border: 1px solid black;
+            background-color: white;
+        }
+
+        #image-label {
+            margin-top: 10px;
+        }
+
+        #recognized-text {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+            display: none;
+        }
+
+        #developed-by {
+            text-align: center;
+            font-size: 20px;
+            margin-top: 50px;
+        }
+
+        marquee {
+            font-size: 18px;
+            color: brown;
+            font-family: 'bodoni mt', serif;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- heading-->
+        <div class="row">
+            <div class="col-md-12 header">
+                Image Recognition App
+            </div>
+        </div>
+        <!-- image upload-->
+        <div class="row">
+            <div class="col-md-12 image-upload">
+                <form id="uploadForm" method="post" enctype="multipart/form-data">
+                    <div class="form-group">
+                        <input type="file" class="form-control-file" name="image" id="image" accept="image/*" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-primary" value="Recognize Image">
+                    </div>
+                </form>
+                <img src="" alt="Uploaded Image" id="uploaded-image" style="display: none;">
+                <div id="image-label"></div>
+                <div id="recognized-text"></div>
+            </div>
+        </div>
+        <!-- marquee rotation-->
+        <div class="row">
+            <div class="col-md-12" id="developed-by">
+                <marquee>Developed by Shreya Bathla</marquee>
+            </div>
+        </div>
+    </div>
+    <!-- java code for app operation-->
+    <script>
+        const form = document.getElementById('uploadForm');
+        const uploadedImage = document.getElementById('uploaded-image');
+        const imageLabel = document.getElementById('image-label');
+        const recognizedText = document.getElementById('recognized-text');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            recognizedText.innerHTML = 'Processing...';
+
+            const formData = new FormData();
+            formData.append('image', form.image.files[0]);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+                const data = await response.json();
+                recognizedText.innerHTML = `The uploaded image is: ${data.result}`;
+                uploadedImage.src = URL.createObjectURL(form.image.files[0]);
+                uploadedImage.style.display = 'block';
+                imageLabel.innerHTML = 'Uploaded Image:';
+                recognizedText.style.display = 'block';
+            } catch (error) {
+                recognizedText.innerHTML = 'Error occurred during processing.';
+                uploadedImage.style.display = 'none';
+                imageLabel.innerHTML = '';
+                recognizedText.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
